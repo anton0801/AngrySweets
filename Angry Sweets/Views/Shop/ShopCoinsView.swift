@@ -1,12 +1,11 @@
 import SwiftUI
 
-struct ShopProductTypes: View {
-    
+struct ShopCoinsView: View {
     @Environment(\.presentationMode) var pres
     
     @State var balance = 0
     
-    @StateObject var iapManager: IAPManager = IAPManager()
+    @EnvironmentObject var iapManager: IAPManager
     
     var body: some View {
         NavigationView {
@@ -30,15 +29,15 @@ struct ShopProductTypes: View {
                     }
                 }
                 
-                HStack {
-                    NavigationLink(destination: ShopBackgroundsView()
-                        .navigationBarBackButtonHidden()) {
-                        Image("shop_type_backgrounds")
-                    }
-                    NavigationLink(destination: ShopCoinsView()
-                        .environmentObject(iapManager)
-                        .navigationBarBackButtonHidden()) {
-                        Image("shop_type_coins")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(shopDataCoins, id: \.previewImage) { shopDataItem in
+                            NavigationLink(destination: ShopDetailsCoinView(shopItem: shopDataItem)
+                                .environmentObject(iapManager)
+                                .navigationBarBackButtonHidden()) {
+                                    Image(shopDataItem.previewImage)
+                                }
+                        }
                     }
                 }
             }
@@ -48,6 +47,7 @@ struct ShopProductTypes: View {
                     .frame(width: UIScreen.main.bounds.width,
                            height: UIScreen.main.bounds.height + 25)
                     .ignoresSafeArea()
+                    .opacity(0.7)
             )
             .onAppear {
                 balance = UserDefaults.standard.integer(forKey: "balance")
@@ -55,9 +55,9 @@ struct ShopProductTypes: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
     }
-    
 }
 
 #Preview {
-    ShopProductTypes()
+    ShopCoinsView()
+        .environmentObject(IAPManager())
 }
